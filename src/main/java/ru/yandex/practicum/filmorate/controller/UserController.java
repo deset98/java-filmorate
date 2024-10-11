@@ -43,7 +43,7 @@ public class UserController {
         return users.values();
     }
 
-    private void validateUser(User user) throws ValidationException {
+    void validateUser(User user) throws ValidationException {
         String exceptionMessage;
 
         // при создании и обновлении

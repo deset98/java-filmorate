@@ -39,7 +39,7 @@ public class FilmController {
         return films.values();
     }
 
-    private void validateFilm(Film film) throws ValidationException {
+    void validateFilm(Film film) throws ValidationException {
         String exceptionMessage;
 
         // при создании и обновлении
@@ -53,7 +53,7 @@ public class FilmController {
             log.warn("Исключение при добавлении/изменении фильма ID {}, '{}'", film.getId(), exceptionMessage);
             throw new ValidationException(exceptionMessage);
         }
-        if (film.getDuration().toNanos() <= 0) {
+        if (film.getDuration() <= 0) {
             exceptionMessage = "У фильма указана отрицательная длительность";
             log.warn("Исключение при добавлении/изменении фильма ID {}, '{}'", film.getId(), exceptionMessage);
             throw new ValidationException("Продолжительность фильма должна быть положительным числом");
