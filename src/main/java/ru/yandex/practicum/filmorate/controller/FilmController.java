@@ -39,7 +39,7 @@ public class FilmController {
         return films.values();
     }
 
-    void validateFilm(Film film) throws ValidationException {
+    private void validateFilm(Film film) throws ValidationException {
         String exceptionMessage;
 
         // при создании и обновлении
