@@ -2,13 +2,15 @@ package ru.yandex.practicum.filmorate.model;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
-@Builder
+@RequiredArgsConstructor
 public class Film {
     private long id;
     @NotBlank(message = "не введено название фильма")
@@ -19,4 +21,5 @@ public class Film {
     private LocalDate releaseDate;
     @NotNull(message = "не установлена длительность фильма")
     private long duration;
+    private Set<Long> likes = new HashSet<>();
 }

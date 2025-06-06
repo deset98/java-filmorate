@@ -1,77 +1,74 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.exception.CreationException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
-import java.time.LocalDate;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/users")
-@Slf4j
 public class UserController {
-    private final Map<Long, User> users = new HashMap<>();
+    private final UserService userService;
 
-    @PostMapping
-    public User createUser(@Valid @RequestBody User newUser) throws ValidationException {
-        validateUser(newUser);
-        newUser.setId(getNextId());
-        users.put(newUser.getId(), newUser);
-        log.info("Создан новый пользователь ID: {} - {}", newUser.getId(), newUser.getLogin());
-        return newUser;
+    @Autowired
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
-    @PutMapping
-    public User updateUser(@Valid @RequestBody User updUser) throws ValidationException {
-        validateUser(updUser);
+    @GetMapping("/user/{userId}")
+    public User getUser(@PathVariable Long userId) {
+        return userService.getUser(userId);
+    }
 
-        users.put(updUser.getId(), updUser);
-        log.info("Обновлены данные пользователя ID: {} - {}", updUser.getId(), updUser.getLogin());
+    @PutMapping("/{userId}/friends/{friendId}")
+    public Collection<User> addFriend(
+            @PathVariable Long userId,
+            @PathVariable Long friendId)
+            throws NotFoundException {
+        return userService.addFriend(userId, friendId);
+    }
 
-        users.put(updUser.getId(), updUser);
-        log.info("Обновлены данные пользователя ID: {} - {}", updUser.getId(), updUser.getLogin());
-        return updUser;
+
+    @DeleteMapping("/{userId}/friends/{friendId}")
+    public Collection<User> removeFriend(
+            @PathVariable Long userId,
+            @PathVariable Long friendId)
+            throws NotFoundException {
+        return userService.removeFriend(userId, friendId);
+    }
+
+    @GetMapping("/{userId}/friends")
+    public Collection<User> getFriends(
+            @PathVariable Long userId)
+            throws NotFoundException {
+        return userService.getFriends(userId);
+    }
+
+    @GetMapping("/{userId}/friends/common/{friendId}")
+    public Collection<User> getCommonFriends(
+            @PathVariable Long userId,
+            @PathVariable Long friendId)
+            throws NotFoundException {
+        return userService.getCommonFriends(userId, friendId);
     }
 
     @GetMapping
     public Collection<User> getAllUsers() {
-        return users.values();
+        return userService.getAllUsers();
     }
 
-    private void validateUser(User user) throws ValidationException {
-        String exceptionMessage;
-
-        // при создании и обновлении
-        if (user.getName() == null || user.getName().isEmpty() || user.getName().isBlank()) {
-            log.info("Отсутствует имя пользователя: {}; Вместо имени установлен логин: {}",
-                    user.getId(), user.getLogin());
-            user.setName(user.getLogin());
-        }
-        if (user.getBirthday().isAfter(LocalDate.now())) {
-            exceptionMessage = "Дата рождения установлена в будущем";
-            log.warn("Исключение при добавлении/изменении пользователя ID {}, '{}'", user.getId(), exceptionMessage);
-            throw new ValidationException(exceptionMessage);
-        }
-
-        // только при обновлении
-        if (user.getId() > 0 && !users.containsKey(user.getId())) {
-            exceptionMessage = "Пользователя с таким ID не существует";
-            log.warn("Исключение при изменении пользователя ID {}, '{}'", user.getId(), exceptionMessage);
-            throw new ValidationException(exceptionMessage);
-        }
+    @PostMapping
+    public User createUser(@Valid @RequestBody User newUser) throws CreationException {
+        return userService.createUser(newUser);
     }
 
-    private long getNextId() {
-        long currentMaxId = users.keySet()
-                .stream()
-                .mapToLong(id -> id)
-                .max()
-                .orElse(0);
-        return ++currentMaxId;
+    @PutMapping
+    public User updateUser(@Valid @RequestBody User updUser) throws CreationException {
+        return userService.updateUser(updUser);
     }
 }

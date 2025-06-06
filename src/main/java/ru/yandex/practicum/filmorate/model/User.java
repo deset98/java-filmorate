@@ -3,13 +3,15 @@ package ru.yandex.practicum.filmorate.model;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
-@Builder
+@RequiredArgsConstructor
 public class User {
 
     private long id;
@@ -21,4 +23,5 @@ public class User {
     private String name;
     @NotNull(message = "не установлен день рождения пользователя")
     private LocalDate birthday;
+    private final Set<Long> friends = new HashSet<>();
 }
