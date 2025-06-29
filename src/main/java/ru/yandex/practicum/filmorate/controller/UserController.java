@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.CreationException;
+import ru.yandex.practicum.filmorate.exception.InternalServerException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
@@ -20,26 +21,26 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("/user/{userId}")
+    @GetMapping("/{userId}")
     public User getUser(@PathVariable Long userId) {
         return userService.getUser(userId);
     }
 
     @PutMapping("/{userId}/friends/{friendId}")
-    public Collection<User> addFriend(
+    public void addFriend(
             @PathVariable Long userId,
             @PathVariable Long friendId)
             throws NotFoundException {
-        return userService.addFriend(userId, friendId);
+        userService.addFriend(userId, friendId);
     }
 
 
     @DeleteMapping("/{userId}/friends/{friendId}")
-    public Collection<User> removeFriend(
+    public void removeFriend(
             @PathVariable Long userId,
             @PathVariable Long friendId)
-            throws NotFoundException {
-        return userService.removeFriend(userId, friendId);
+            throws NotFoundException, InternalServerException {
+        userService.removeFriend(userId, friendId);
     }
 
     @GetMapping("/{userId}/friends")
@@ -63,12 +64,12 @@ public class UserController {
     }
 
     @PostMapping
-    public User createUser(@Valid @RequestBody User newUser) throws CreationException {
+    public User createUser(@Valid @RequestBody User newUser) throws CreationException, InternalServerException {
         return userService.createUser(newUser);
     }
 
     @PutMapping
-    public User updateUser(@Valid @RequestBody User updUser) throws CreationException {
+    public User updateUser(@Valid @RequestBody User updUser) throws CreationException, InternalServerException {
         return userService.updateUser(updUser);
     }
 }

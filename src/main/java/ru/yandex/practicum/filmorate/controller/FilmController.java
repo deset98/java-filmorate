@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.CreationException;
+import ru.yandex.practicum.filmorate.exception.InternalServerException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
@@ -25,20 +26,25 @@ public class FilmController {
         return filmService.getFilm(filmId);
     }
 
+    @GetMapping
+    public Collection<Film> getFilms() {
+        return filmService.getFilms();
+    }
+
     @PutMapping("/{filmId}/like/{userId}")
-    public Film likeFilm(
+    public void likeFilm(
             @PathVariable Long filmId,
             @PathVariable Long userId)
             throws NotFoundException {
-        return filmService.likeFilm(filmId, userId);
+        filmService.likeFilm(filmId, userId);
     }
 
     @DeleteMapping("/{filmId}/like/{userId}")
-    public Film unlikeFilm(
+    public void unlikeFilm(
             @PathVariable Long filmId,
             @PathVariable Long userId)
             throws NotFoundException {
-        return filmService.unlikeFilm(filmId, userId);
+        filmService.unlikeFilm(filmId, userId);
     }
 
     @GetMapping("/popular")
@@ -47,17 +53,12 @@ public class FilmController {
     }
 
     @PostMapping
-    public Film addFilm(@Valid @RequestBody Film newFilm) throws CreationException {
+    public Film addFilm(@Valid @RequestBody Film newFilm) throws CreationException, InternalServerException {
         return filmService.addFilm(newFilm);
     }
 
     @PutMapping
-    public Film updateFilm(@Valid @RequestBody Film updFilm) throws CreationException {
+    public Film updateFilm(@Valid @RequestBody Film updFilm) throws CreationException, InternalServerException {
         return filmService.updateFilm(updFilm);
-    }
-
-    @GetMapping
-    public Collection<Film> getFilms() {
-        return filmService.getFilms();
     }
 }
