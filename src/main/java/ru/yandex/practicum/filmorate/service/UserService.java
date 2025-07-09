@@ -1,12 +1,13 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dal.repositories.user.UserStorage;
 import ru.yandex.practicum.filmorate.exception.CreationException;
+import ru.yandex.practicum.filmorate.exception.InternalServerException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.Collection;
 
@@ -16,20 +17,20 @@ public class UserService {
     private final UserStorage userStorage;
 
     @Autowired
-    public UserService(final InMemoryUserStorage inMemoryUserStorage) {
-        this.userStorage = inMemoryUserStorage;
+    public UserService(@Qualifier("UserDbStorage") final UserStorage userStorage) {
+        this.userStorage = userStorage;
     }
 
     public User getUser(Long userId) throws NotFoundException {
         return userStorage.getUser(userId);
     }
 
-    public Collection<User> addFriend(Long userId, Long friendId) throws NotFoundException {
-        return userStorage.addFriend(userId, friendId);
+    public void addFriend(Long userId, Long friendId) throws NotFoundException {
+        userStorage.addFriend(userId, friendId);
     }
 
-    public Collection<User> removeFriend(Long userId, Long friendId) throws NotFoundException {
-        return userStorage.removeFriend(userId, friendId);
+    public void removeFriend(Long userId, Long friendId) throws NotFoundException, InternalServerException {
+        userStorage.removeFriend(userId, friendId);
     }
 
     public Collection<User> getFriends(Long userId) throws NotFoundException {
@@ -40,11 +41,11 @@ public class UserService {
         return userStorage.getCommonFriends(userId, friendId);
     }
 
-    public User createUser(User newUser) throws CreationException {
+    public User createUser(User newUser) throws CreationException, InternalServerException {
         return userStorage.createUser(newUser);
     }
 
-    public User updateUser(User updUser) throws CreationException {
+    public User updateUser(User updUser) throws CreationException, InternalServerException {
         return userStorage.updateUser(updUser);
     }
 
